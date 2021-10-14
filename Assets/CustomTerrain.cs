@@ -14,19 +14,19 @@ public class CustomTerrain : MonoBehaviour
 
     public void RandomTerrain()
     {
-        float[,] heightMap;
-        heightMap = new float[terrainData.heightmapWidth, terrainData.heightmapHeight];
-        for (int x = 0; x < terrainData.heightmapWidth; x++)
+        float[,] heightMap = terrainData.GetHeights(0, 0, terrainData.heightmapResolution,
+                                                           terrainData.heightmapResolution);
+        for (int x = 0; x < terrainData.heightmapResolution; x++)
         {
-            for (int y = 0; y < terrainData.heightmapHeight; y++)
+            for (int z = 0; z < terrainData.heightmapResolution; z++)
             {
-                heightMap[x, y] = UnityEngine.Random.Range(randomHeightRange.x, randomHeightRange.y);
+                heightMap[x, z] += UnityEngine.Random.Range(randomHeightRange.x, randomHeightRange.y);
             }
         }
         terrainData.SetHeights(0, 0, heightMap);
     }
 
-    void OnEnabled()
+    void OnEnable()
     {
         Debug.Log("Initialising Terrain Data");
         terrain = this.GetComponent<Terrain>();

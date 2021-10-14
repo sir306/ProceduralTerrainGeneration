@@ -245,8 +245,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomHeightRange: {x: 0, y: 0.1}
-  terrain: {fileID: 0}
-  terrainData: {fileID: 0}
+  terrain: {fileID: 1422549362}
+  terrainData: {fileID: 15600000, guid: e2a5374d3b21cd64f86da2ec16c08129, type: 2}
 --- !u!154 &1422549361
 TerrainCollider:
   m_ObjectHideFlags: 0
