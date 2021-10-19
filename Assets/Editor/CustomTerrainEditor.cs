@@ -23,6 +23,12 @@ public class CustomTerrainEditor : Editor
     //multiple perlin noise
     GUITableState perlinParameterTable;
     SerializedProperty perlinParameters;
+    //voronoi 
+    SerializedProperty voronoiDropOff;
+    SerializedProperty voronoifallOff;
+    SerializedProperty voronoiSinMountain;
+    SerializedProperty voronoiAdd;
+    bool sinMountain = false;
 
 
     // fold outs ---------
@@ -30,6 +36,7 @@ public class CustomTerrainEditor : Editor
     bool showLoadHeights = false;
     bool showPerlinNoise = false;
     bool showMultiplePerlinNoise = false;
+    bool showVoronoi = false;
 
 
     void OnEnable()
@@ -49,6 +56,11 @@ public class CustomTerrainEditor : Editor
         //multiple perlin noise
         perlinParameterTable = new GUITableState("perlinParameterTable");
         perlinParameters = serializedObject.FindProperty("perlinParameters");
+        //voronoi
+        voronoiDropOff = serializedObject.FindProperty("voronoiDropOff");
+        voronoifallOff = serializedObject.FindProperty("voronoifallOff");
+        voronoiAdd = serializedObject.FindProperty("voronoiAdd");
+        voronoiSinMountain = serializedObject.FindProperty("voronoiSinMountain");
     }
 
     public override void OnInspectorGUI()
@@ -128,6 +140,36 @@ public class CustomTerrainEditor : Editor
             if (GUILayout.Button("Apply Multiple Perlin"))
             {
                 terrain.MultiplePerlinTerrain();
+            }
+        }
+
+        // Voronoi
+        showVoronoi = EditorGUILayout.Foldout(showVoronoi, "Voronoi");
+        if (showVoronoi)
+        {
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            GUILayout.Label("Add multiple mountains", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(voronoiAdd);
+            GUILayout.Label("Sin Mountain", EditorStyles.boldLabel);
+            
+            sinMountain = EditorGUILayout.Toggle("Use Voronoi Sin Equation", sinMountain);
+            
+            if (!sinMountain)
+            {
+                terrain.SetVoronoiSin();
+                EditorGUILayout.Slider(voronoifallOff, -10, 10, new GUIContent("Voronoi Fall Off"));
+                EditorGUILayout.Slider(voronoiDropOff, -10, 10, new GUIContent("Voronoi Drop Off"));
+            }
+            else
+            {
+                terrain.SetVoronoiSin();
+                GUI.enabled = false;
+                EditorGUILayout.PropertyField(voronoiSinMountain);
+                GUI.enabled = true;
+            }
+            if (GUILayout.Button("Add Voronoi"))
+            {
+                terrain.Voronoi();
             }
         }
 

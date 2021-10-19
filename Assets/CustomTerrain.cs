@@ -36,6 +36,12 @@ public class CustomTerrain : MonoBehaviour
         public float mPerlinHeightScale = 0.09f;
         public bool remove = false;
     }
+    //VORONOI -------------------------------------------------------
+    public float voronoifallOff = 0.2f;
+    public float voronoiDropOff = 0.6f;
+    public bool voronoiSinMountain = true;
+    public bool voronoiAdd = false;
+
 
     public List<PerlinParameters> perlinParameters = new List<PerlinParameters>()
     {
@@ -112,6 +118,71 @@ public class CustomTerrain : MonoBehaviour
             keptPerlinParameters.Add(perlinParameters[0]); // add at least one
         }
         perlinParameters = keptPerlinParameters;
+    }
+
+    // Voronoi
+    public void Voronoi()
+    {
+        float[,] heightMap = GetHeightMap();
+        
+        Vector3 peak = new Vector3(UnityEngine.Random.Range(0, terrainData.heightmapResolution),
+                                    UnityEngine.Random.Range(0.0f, 1.0f),
+                                    UnityEngine.Random.Range(0, terrainData.heightmapResolution)
+                                    );
+
+        heightMap[(int)peak.x, (int)peak.z] = peak.y;
+
+        // slope
+        Vector2 peakLocation = new Vector2(peak.x, peak.z);
+        float maxDistance = Vector2.Distance(new Vector2(0, 0), new Vector2(terrainData.heightmapResolution, terrainData.heightmapResolution));
+        
+        for(int y = 0; y < terrainData.heightmapResolution; y++)
+        {
+            for(int x = 0; x < terrainData.heightmapResolution; x++)
+            {
+                if (!(x == peak.x && y == peak.z))
+                {
+                    float distanceToPeak = Vector2.Distance(peakLocation, new Vector2(x, y)) / maxDistance;
+                    if(voronoiSinMountain)
+                    {
+                        float h = peak.y - distanceToPeak - Mathf.Sin(distanceToPeak * 100) * 0.001f;
+                        if (voronoiAdd)
+                        {
+                            heightMap[x, y] += h;
+                        }
+                        else
+                        {
+                            heightMap[x, y] = h;
+                        }
+                    }
+                    else
+                    {
+                        float h = peak.y - distanceToPeak * voronoifallOff - Mathf.Pow(distanceToPeak, voronoiDropOff);
+                        if (voronoiAdd)
+                        {
+                            heightMap[x, y] += h;
+                        }
+                        else
+                        {
+                            heightMap[x, y] = h;
+                        }
+                    }
+                }
+            }
+        }
+
+        terrainData.SetHeights(0, 0, heightMap);
+    }
+    public void SetVoronoiSin()
+    {
+        if (voronoiSinMountain)
+        {
+            voronoiSinMountain = false;
+        }
+        else
+        {
+            voronoiSinMountain = true;
+        }
     }
 
     public void RandomTerrain()
